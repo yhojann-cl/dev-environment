@@ -13,10 +13,10 @@ To manage services run:
 
 ```bash
 # Start services
-docker compose up -d;
+sudo docker compose up -d;
 
 # Stop services
-docker compose down -d;
+sudo docker compose down;
 ```
 
 
@@ -126,7 +126,7 @@ dig -t mx example.com @127.0.0.1 -p 5353;
 dig -t axfr example.com @127.0.0.1 -p 5353;
 ```
 
-- **Image**: `internetsystemsconsortium/bind9:9.18`
+- **Image**: `ubuntu/bind9:latest`
 - **Ports**:
   - `53/udp` bound to `127.0.0.1:5353`
   - `53/tcp` bound to `127.0.0.1:5353`

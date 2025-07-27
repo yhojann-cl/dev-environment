@@ -25,6 +25,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: dev
       POSTGRES_DB: dev
+      PGDATA: /var/lib/postgresql/data/pgdata
     volumes:
       - ./dev/postgres:/var/lib/postgresql/data
     restart: unless-stopped
@@ -45,24 +46,31 @@ services:
       - "127.0.0.1:27017:27017"
     restart: unless-stopped
 
-  smtp:
-    image: boky/postfix:latest
-    container_name: postfix
-    environment:
-      HOSTNAME: mail.example.com
-      ALLOW_EMPTY_SENDER_DOMAINS: 'true'
-    volumes:
-      - ./dev/postfix:/etc/opendkim/keys
+  mail:
+    image: mailserver/docker-mailserver:latest
+    container_name: mail
+    hostname: mail
+    domainname: example.com
+    env_file: ./dev/mail/mail.env
     ports:
-      - "127.0.0.1:2525:25"
+      - "25:25"
+      - "587:587"
+      - "993:993"
+    volumes:
+      - ./dev/mail/maildata:/var/mail
+      - ./dev/mail/mailstate:/var/mail-state
+      - ./dev/mail/maillogs:/var/log/mail
+      - ./dev/mail/config:/tmp/docker-mailserver
     restart: unless-stopped
+    cap_add:
+      - NET_ADMIN
 
   bind9:
-    image: internetsystemsconsortium/bind9:9.18
+    image: ubuntu/bind9:latest
     container_name: bind9
     ports:
-      - "127.0.0.1:5353:53/udp"
-      - "127.0.0.1:5353:53/tcp"
+      - "127.0.0.1:9953:53/udp"
+      - "127.0.0.1:9953:53/tcp"
     volumes:
       - ./dev/bind9/named.conf:/etc/bind/named.conf:ro
       - ./dev/bind9/named.conf.local:/etc/bind/named.conf.local:ro
