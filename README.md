@@ -1,28 +1,44 @@
 # Development Environment with Docker Compose
 
-This repository provides a complete `docker-compose.yml` configuration for setting up the following services:
+This repository provides a complete `docker-compose.yml` configuration for
+setting up services:
 
 - **PostgreSQL 12**
 - **MongoDB 8.0.4**
 - **SMTP Server using boky/postfix**
-- **BIND9 DNS Server**
-
-## Requirements
-
-- Docker
-- Docker Compose
-
-## Getting Started
-
-To start the services, run:
 
 ```bash
 docker compose up -d
 ```
 
+
 ## Services Overview
 
 ### PostgreSQL
+
+The postgres service provides a reliable PostgreSQL 12 database instance
+preconfigured with a default database named dev. It uses the username postgres
+and the password dev, and stores persistent data on the host under
+`./dev/postgres`. This setup is ideal for local development and testing
+purposes, offering compatibility with a wide range of PostgreSQL tools and
+drivers.
+
+To connect to the database from your host machine using the psql command-line
+client, run:
+
+```bash
+psql -h 127.0.0.1 -p 5432 -U postgres -d dev
+```
+
+To restart all database including serials, increments, tables, procedures and
+views, you can execute this sql command on the prompt:
+
+```sql
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO postgres;
+GRANT ALL ON SCHEMA public TO public;
+```
 
 - **Image**: `postgres:12`
 - **Port**: `5432` (bound to `127.0.0.1`)
@@ -33,6 +49,17 @@ docker compose up -d
 - **Volume:** `./dev/postgres:/var/lib/postgresql/data`
 
 ### MongoDB
+
+The mongodb service runs a MongoDB 8.0.4 instance with an initialized root user
+(`root`) and password (`dev`). The default database dev is also created on
+startup. Data is persisted in the `./dev/mongodb` directory on the host, making
+this setup suitable for local development and containerized application testing.
+
+To connect to the MongoDB instance from your host using the mongosh shell, run:
+
+```bash
+mongosh "mongodb://root:dev@127.0.0.1:27017/dev?authSource=admin"
+```
 
 - **Image**: `mongo:8.0.4`
 - **Port**: `27017` (bound to `127.0.0.1`)
@@ -52,9 +79,23 @@ docker compose up -d
 - **Environment**:
   - `HOSTNAME=mail.example.com`
   - `ALLOW_EMPTY_SENDER_DOMAINS=true`
-- ** Volume**: `./dev/postfix:/etc/opendkim/keys`
+- **Volume**: `./dev/postfix:/etc/opendkim/keys`
 
 ### BIND9 DNS Server
+
+The bind9 service in this setup acts as a fully functional DNS server,
+supporting all standard DNS record types as defined by the relevant RFCs,
+including zone transfers (AXFR). All DNS records are configured under the domain
+`example.com`, making it suitable for testing and development environments that
+require custom DNS resolution. You can query the DNS server locally using the
+dig utility. For example, to retrieve the A record of www.example.com, use the
+following command:
+
+```bash
+dig -t a example.com @127.0.0.1 -p 5353;
+dig -t mx example.com @127.0.0.1 -p 5353;
+dig -t axfr example.com @127.0.0.1 -p 5353;
+```
 
 - **Image**: `internetsystemsconsortium/bind9:9.18`
 - **Ports**:
