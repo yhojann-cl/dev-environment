@@ -113,9 +113,13 @@ functional mail server using Postfix, supporting:
 - Compatible with external clients like Thunderbird, Outlook, or `msmtp`
 
 - **Ports**:
-  - `25/udp` bound to `127.0.0.1:9925`
-  - `587/tcp` bound to `127.0.0.1:9587`
-  - `993/tcp` bound to `127.0.0.1:9993`
+  - `25/udp` bound to `127.0.0.1:9925` Basic SMTP (unencrypted sending).
+  - `110/udp` bound to `127.0.0.1:9110` POP3 (unencrypted receiving).
+  - `143/udp` bound to `127.0.0.1:9143` IMAP (unencrypted remote access).
+  - `465/udp` bound to `127.0.0.1:9465` SMTP over SSL (secure sending).
+  - `587/udp` bound to `127.0.0.1:9587` SMTP with STARTTLS (authenticated).
+  - `993/udp` bound to `127.0.0.1:9993` IMAPS (IMAP over SSL).
+  - `995/udp` bound to `127.0.0.1:9995` POP3S (POP3 over SSL).
 - **volumes**:
   - `./dev/mail/maildata:/var/mail	` User mailbox storage.
   - `./dev/mail/mailstate:/var/mail-state` Mail server internal state.
@@ -132,6 +136,28 @@ functional mail server using Postfix, supporting:
   - `SSL_TYPE=manual`
   - `TLS_LEVEL=modern`
   - `SASL_PASSWD=no-reply@example.com:dev`
+
+For account creation:
+
+```bash
+docker run --rm \
+  -v ./dev/mail/config:/tmp/docker-mailserver \
+  mailserver/docker-mailserver:latest \
+  setup email add no-reply@example.com dev;
+```
+
+For testing access can execute the command:
+
+```bash
+swaks --to user@example.com \
+  --from no-reply@example.com \
+  --server 127.0.0.1:9587 \
+  --auth LOGIN \
+  --auth-user no-reply@example.com \
+  --auth-password dev \
+  --tls \
+  --data "Subject: Test Mail\n\nHello from Postfix with STARTTLS";
+```
 
 ### BIND9 DNS Server
 

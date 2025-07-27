@@ -59,17 +59,20 @@ services:
       ENABLE_SASLAUTHD: 1
       PERMIT_DOCKER: network
       ONE_DIR: 1
-      SSL_TYPE: manual
       TLS_LEVEL: modern
       SASL_PASSWD: no-reply@example.com:dev
     ports:
       - "127.0.0.1:9925:25"
+      - "127.0.0.1:9110:110"
+      - "127.0.0.1:9143:143"
+      - "127.0.0.1:9465:465"
       - "127.0.0.1:9587:587"
       - "127.0.0.1:9993:993"
+      - "127.0.0.1:9995:995"
     volumes:
-      - ./dev/mail/maildata:/var/mail
-      - ./dev/mail/mailstate:/var/mail-state
-      - ./dev/mail/maillogs:/var/log/mail
+      - ./dev/mail/data:/var/mail
+      - ./dev/mail/state:/var/mail-state
+      - ./dev/mail/logs:/var/log/mail
       - ./dev/mail/config:/tmp/docker-mailserver
     restart: unless-stopped
     cap_add:
@@ -82,9 +85,9 @@ services:
       - "127.0.0.1:9953:53/udp"
       - "127.0.0.1:9953:53/tcp"
     volumes:
-      - ./dev/bind9/named.conf:/etc/bind/named.conf:ro
-      - ./dev/bind9/named.conf.local:/etc/bind/named.conf.local:ro
-      - ./dev/bind9/db.example.com:/etc/bind/db.example.com:ro
+      - ./dev/bind9/assets/named.conf:/etc/bind/named.conf:ro
+      - ./dev/bind9/assets/named.conf.local:/etc/bind/named.conf.local:ro
+      - ./dev/bind9/assets/db.example.com:/etc/bind/db.example.com:ro
     environment:
       - TZ=UTC
     cap_add:
