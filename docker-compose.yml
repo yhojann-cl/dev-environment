@@ -51,11 +51,21 @@ services:
     container_name: mail
     hostname: mail
     domainname: example.com
-    env_file: ./dev/mail/mail.env
+    environment:
+      ENABLE_SPAMASSASSIN: 0
+      ENABLE_CLAMAV: 0
+      ENABLE_FAIL2BAN: 0
+      ENABLE_POSTGREY: 0
+      ENABLE_SASLAUTHD: 1
+      PERMIT_DOCKER: network
+      ONE_DIR: 1
+      SSL_TYPE: manual
+      TLS_LEVEL: modern
+      SASL_PASSWD: no-reply@example.com:dev
     ports:
-      - "25:25"
-      - "587:587"
-      - "993:993"
+      - "127.0.0.1:9925:25"
+      - "127.0.0.1:9587:587"
+      - "127.0.0.1:9993:993"
     volumes:
       - ./dev/mail/maildata:/var/mail
       - ./dev/mail/mailstate:/var/mail-state

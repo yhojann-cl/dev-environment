@@ -103,12 +103,35 @@ mongosh "mongodb://root:dev@127.0.0.1:27017/dev?authSource=admin"
 
 ### SMTP Server (Postfix)
 
-- **Image**: `boky/postfix:latest`
-- **Port**: `2525` (bound to `127.0.0.1`)
+Postfix with STARTTLS and SASL Authentication. This service provides a fully
+functional mail server using Postfix, supporting:
+
+- SMTP over port **587** with **STARTTLS**
+- Authentication via **SASL** (login/password)
+- Custom user setup (`no-reply@example.com`)
+- Persistent volumes for mail data, state, logs, and configuration
+- Compatible with external clients like Thunderbird, Outlook, or `msmtp`
+
+- **Ports**:
+  - `25/udp` bound to `127.0.0.1:9925`
+  - `587/tcp` bound to `127.0.0.1:9587`
+  - `993/tcp` bound to `127.0.0.1:9993`
+- **volumes**:
+  - `./dev/mail/maildata:/var/mail	` User mailbox storage.
+  - `./dev/mail/mailstate:/var/mail-state` Mail server internal state.
+  - `./dev/mail/maillogs	:/var/log/mail` Log files.
+  - `./dev/mail/config:/tmp/docker-mailserver` Configuration files & SSL certificates.
 - **Environment**:
-  - `HOSTNAME=mail.example.com`
-  - `ALLOW_EMPTY_SENDER_DOMAINS=true`
-- **Volume**: `./dev/postfix:/etc/opendkim/keys`
+  - `ENABLE_SPAMASSASSIN=0`
+  - `ENABLE_CLAMAV=0`
+  - `ENABLE_FAIL2BAN=0`
+  - `ENABLE_POSTGREY=0`
+  - `ENABLE_SASLAUTHD=1`
+  - `PERMIT_DOCKER=network`
+  - `ONE_DIR=1`
+  - `SSL_TYPE=manual`
+  - `TLS_LEVEL=modern`
+  - `SASL_PASSWD=no-reply@example.com:dev`
 
 ### BIND9 DNS Server
 
