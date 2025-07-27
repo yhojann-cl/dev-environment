@@ -4,9 +4,10 @@ This repository provides a complete `docker-compose.yml` configuration for
 setting up services:
 
 - **PostgreSQL 12**
-- **MongoDB 8.0.4**
-- **SMTP Server using boky/postfix**
-- **Bind9 9.18**
+- **MySQL 8**
+- **MongoDB 8**
+- **Postfix SMTP**
+- **Bind9 9**
 
 To manage services run:
 
@@ -20,6 +21,27 @@ docker compose down -d;
 
 
 ## Services Overview
+
+### MySQL
+
+This service runs a MySQL 8.0 instance for local development. It creates a
+default database and user credentials for immediate use.
+
+- **Image**: `mysql:8.0`
+- **Port**: `3306` (bound to `127.0.0.1`)
+- **Environment**:
+  - `MYSQL_ROOT_PASSWORD=dev`
+  - `MYSQL_DATABASE=dev`
+  - `MYSQL_USER=dev`
+  - `MYSQL_PASSWORD=dev`
+- **Volume:** `./dev/mysql:/var/lib/mysql`
+
+You can connect to the MySQL server using the following command:
+
+```
+mysql -h 127.0.0.1 -P 3306 -u dev -p
+```
+
 
 ### PostgreSQL
 
