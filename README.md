@@ -6,9 +6,16 @@ setting up services:
 - **PostgreSQL 12**
 - **MongoDB 8.0.4**
 - **SMTP Server using boky/postfix**
+- **Bind9 9.18**
+
+To manage services run:
 
 ```bash
-docker compose up -d
+# Start services
+docker compose up -d;
+
+# Stop services
+docker compose down -d;
 ```
 
 
